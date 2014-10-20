@@ -1,0 +1,11 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+target 'ImagePageView', :exclusive => true do
+  pod "ImagePageView", :path => "../"
+end
+
+target 'Tests', :exclusive => true do
+  pod "ImagePageView", :path => "../"
+
+  
+end
