@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		010A1E3919F5852500F99BF0 /* IPVCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 010A1E3819F5852500F99BF0 /* IPVCollectionViewCell.m */; };
+		010A1E3C19F58C6100F99BF0 /* IPVPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 010A1E3B19F58C6100F99BF0 /* IPVPhoto.m */; };
+		012FC72519F6DE64009ACFAF /* IPVPhotosDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 012FC72419F6DE64009ACFAF /* IPVPhotosDataSource.m */; };
+		012FC72B19F728CE009ACFAF /* IPVImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 012FC72A19F728CE009ACFAF /* IPVImageDownloader.m */; };
 		1A2FB1C5695AA3BE7A1DD924 /* libPods-Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 31C32483F5229B0301E0BA56 /* libPods-Tests.a */; };
 		41C27483270CC10860CE5E99 /* libPods-ImagePageView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C98E0F8FA96A2F2945E22807 /* libPods-ImagePageView.a */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
@@ -16,7 +20,7 @@
 		6003F59A195388D20070C39A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F599195388D20070C39A /* main.m */; };
 		6003F59E195388D20070C39A /* IPVAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F59D195388D20070C39A /* IPVAppDelegate.m */; };
 		6003F5A1195388D20070C39A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6003F59F195388D20070C39A /* Main.storyboard */; };
-		6003F5A7195388D20070C39A /* IPVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5A6195388D20070C39A /* IPVViewController.m */; };
+		6003F5A7195388D20070C39A /* IPVCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5A6195388D20070C39A /* IPVCollectionViewController.m */; };
 		6003F5A9195388D20070C39A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5A8195388D20070C39A /* Images.xcassets */; };
 		6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F5AF195388D20070C39A /* XCTest.framework */; };
 		6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
@@ -36,6 +40,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		010A1E3719F5852500F99BF0 /* IPVCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPVCollectionViewCell.h; sourceTree = "<group>"; };
+		010A1E3819F5852500F99BF0 /* IPVCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPVCollectionViewCell.m; sourceTree = "<group>"; };
+		010A1E3A19F58C6100F99BF0 /* IPVPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPVPhoto.h; sourceTree = "<group>"; };
+		010A1E3B19F58C6100F99BF0 /* IPVPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPVPhoto.m; sourceTree = "<group>"; };
+		012FC72319F6DE64009ACFAF /* IPVPhotosDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPVPhotosDataSource.h; sourceTree = "<group>"; };
+		012FC72419F6DE64009ACFAF /* IPVPhotosDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPVPhotosDataSource.m; sourceTree = "<group>"; };
+		012FC72919F728CE009ACFAF /* IPVImageDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPVImageDownloader.h; sourceTree = "<group>"; };
+		012FC72A19F728CE009ACFAF /* IPVImageDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPVImageDownloader.m; sourceTree = "<group>"; };
 		2663FF7EA4040EA2283DAE0A /* Pods-Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Tests/Pods-Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		31C32483F5229B0301E0BA56 /* libPods-Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		327EF375A0C8E6BC79DB4C68 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -52,8 +64,8 @@
 		6003F59C195388D20070C39A /* IPVAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IPVAppDelegate.h; sourceTree = "<group>"; };
 		6003F59D195388D20070C39A /* IPVAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IPVAppDelegate.m; sourceTree = "<group>"; };
 		6003F5A0195388D20070C39A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		6003F5A5195388D20070C39A /* IPVViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IPVViewController.h; sourceTree = "<group>"; };
-		6003F5A6195388D20070C39A /* IPVViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IPVViewController.m; sourceTree = "<group>"; };
+		6003F5A5195388D20070C39A /* IPVCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IPVCollectionViewController.h; sourceTree = "<group>"; };
+		6003F5A6195388D20070C39A /* IPVCollectionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IPVCollectionViewController.m; sourceTree = "<group>"; };
 		6003F5A8195388D20070C39A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6003F5AE195388D20070C39A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -130,12 +142,20 @@
 		6003F593195388D20070C39A /* ImagePageView */ = {
 			isa = PBXGroup;
 			children = (
+				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F59C195388D20070C39A /* IPVAppDelegate.h */,
 				6003F59D195388D20070C39A /* IPVAppDelegate.m */,
+				010A1E3719F5852500F99BF0 /* IPVCollectionViewCell.h */,
+				010A1E3819F5852500F99BF0 /* IPVCollectionViewCell.m */,
+				6003F5A5195388D20070C39A /* IPVCollectionViewController.h */,
+				6003F5A6195388D20070C39A /* IPVCollectionViewController.m */,
+				012FC72919F728CE009ACFAF /* IPVImageDownloader.h */,
+				012FC72A19F728CE009ACFAF /* IPVImageDownloader.m */,
+				010A1E3A19F58C6100F99BF0 /* IPVPhoto.h */,
+				010A1E3B19F58C6100F99BF0 /* IPVPhoto.m */,
+				012FC72319F6DE64009ACFAF /* IPVPhotosDataSource.h */,
+				012FC72419F6DE64009ACFAF /* IPVPhotosDataSource.m */,
 				6003F59F195388D20070C39A /* Main.storyboard */,
-				6003F5A5195388D20070C39A /* IPVViewController.h */,
-				6003F5A6195388D20070C39A /* IPVViewController.m */,
-				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
 			);
 			path = ImagePageView;
@@ -357,9 +377,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				012FC72B19F728CE009ACFAF /* IPVImageDownloader.m in Sources */,
+				010A1E3919F5852500F99BF0 /* IPVCollectionViewCell.m in Sources */,
 				6003F59E195388D20070C39A /* IPVAppDelegate.m in Sources */,
-				6003F5A7195388D20070C39A /* IPVViewController.m in Sources */,
+				6003F5A7195388D20070C39A /* IPVCollectionViewController.m in Sources */,
+				010A1E3C19F58C6100F99BF0 /* IPVPhoto.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
+				012FC72519F6DE64009ACFAF /* IPVPhotosDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

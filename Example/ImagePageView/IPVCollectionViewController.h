@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "IPVPhotosDataSource.h"
 
-@interface IPVViewController : UIViewController
-
+@interface IPVCollectionViewController : UICollectionViewController
+@property (strong, nonatomic) IBOutlet IPVPhotosDataSource *photosDataSource;
 @end
