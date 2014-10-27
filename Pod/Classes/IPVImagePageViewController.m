@@ -133,7 +133,12 @@
     [self setImage:imageScrollViewController.image];
     NSLog(@"%s oldKey%@ newKey=%@",__PRETTY_FUNCTION__, oldKey, _key);
     if (self.navigationItem) {
-        NSString *title = [self.dataSource imagePageViewController:self titleForKey:_key];
+        NSString *title;
+        if ([self.dataSource respondsToSelector:@selector(imagePageViewController:titleForKey:)]) {
+            title = [self.dataSource imagePageViewController:self titleForKey:_key];
+        } else {
+            title = @"";
+        }
         self.navigationItem.title = title;
     }
 }
