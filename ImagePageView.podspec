@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "ImagePageView"
-  s.version          = "0.1.0"
+  s.version          = "0.1.1"
   s.summary          = "ImagePageViewController is manages a UIPageViewController with an async image data source, that also pans and zooms the images"
   s.description      = <<-DESC
                        ImagePageViewController is manages a UIPageViewController with an async image data source
