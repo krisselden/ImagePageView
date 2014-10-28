@@ -33,7 +33,9 @@
             transitionCompleted:(BOOL)completed;
 
 - (void)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
-           didDismissController:(BOOL)dismissed;
+                   didDisappear:(BOOL)animated;
+- (void)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
+                   willAppear:(BOOL)animated;
 
 @end
 

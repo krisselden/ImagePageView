@@ -56,11 +56,19 @@
     [super viewDidLoad];
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    if ([self.delegate respondsToSelector:@selector(imagePageViewController:willAppear:)]){
+        [self.delegate imagePageViewController:self willAppear:animated];
+    }
+}
+
 -(void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    if ([self.delegate respondsToSelector:@selector(imagePageViewController:didDismissController:)]){
-        [self.delegate imagePageViewController:self didDismissController:YES];
+    if ([self.delegate respondsToSelector:@selector(imagePageViewController:didDisappear:)]){
+        [self.delegate imagePageViewController:self didDisappear:animated];
     }
 }
 
