@@ -56,6 +56,12 @@
     [super viewDidLoad];
 }
 
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [self.delegate imagePageViewController:self didDismissController:YES];
+}
+
 -(void)willMoveToParentViewController:(UIViewController *)parent
 {
     [super willMoveToParentViewController:parent];

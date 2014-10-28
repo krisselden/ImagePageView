@@ -32,6 +32,9 @@
                     previousKey:(id)previousKey
             transitionCompleted:(BOOL)completed;
 
+- (void)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
+           didDismissController:(BOOL)dismissed;
+
 @end
 
 @interface IPVImagePageViewController : UIViewController
