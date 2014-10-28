@@ -10,6 +10,10 @@
     IPVImageScrollViewController *_imageScrollViewController;
     BOOL _interactivePopGestureRecognizerWasEnabled;
     UIBarButtonItem *_rightButtonItem;
+    UIGestureRecognizer *_toggleControlsGestureRecognizer;
+    UIColor *_backgroundColor;
+    BOOL _prefersStatusBarHidden;
+    BOOL _controlsHidden;
 }
 
 - (instancetype)init
@@ -29,6 +33,16 @@
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
     return self;
+}
+
+-(BOOL)prefersStatusBarHidden
+{
+    return _prefersStatusBarHidden;
+}
+
+-(UIStatusBarAnimation)preferredStatusBarUpdateAnimation
+{
+    return UIStatusBarAnimationFade;
 }
 
 // TODO tap gesture recognizer for toggling nav bar and status bar
@@ -53,7 +67,12 @@
 - (void)viewDidLoad
 {
     [self addViewForPageViewController];
+    _toggleControlsGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleControls)];
+    [self.view addGestureRecognizer:_toggleControlsGestureRecognizer];
     [super viewDidLoad];
+
+
+
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -90,6 +109,38 @@
         navigationController.interactivePopGestureRecognizer.enabled = NO;
         _rightButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareImage)];
         self.navigationItem.rightBarButtonItem = _rightButtonItem;
+    }
+}
+
+-(void)toggleControls
+{
+    UINavigationController *navigationController = self.navigationController;
+    if (navigationController)
+    {
+        if (_controlsHidden) {
+            _controlsHidden = NO;
+            _prefersStatusBarHidden = NO;
+            [self setNeedsStatusBarAppearanceUpdate];
+            [navigationController setNavigationBarHidden:NO animated:NO];
+            navigationController.navigationBar.alpha = 0;
+            [UIView animateWithDuration:UINavigationControllerHideShowBarDuration
+                             animations:^{
+                                 navigationController.navigationBar.alpha = 1;
+                                 self.view.backgroundColor = _backgroundColor;
+                             }];
+        } else {
+            // stash background color
+            _controlsHidden = YES;
+            _backgroundColor = self.view.backgroundColor;
+            _prefersStatusBarHidden = YES;
+            [self setNeedsStatusBarAppearanceUpdate];
+            [UIView animateWithDuration:UINavigationControllerHideShowBarDuration
+                             animations:^{
+                                 navigationController.navigationBar.alpha = 0;
+                                 [navigationController setNavigationBarHidden:YES animated:NO];
+                                 self.view.backgroundColor = [UIColor blackColor];
+                             }];
+        }
     }
 }
 
