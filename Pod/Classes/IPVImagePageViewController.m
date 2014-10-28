@@ -59,7 +59,9 @@
 -(void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [self.delegate imagePageViewController:self didDismissController:YES];
+    if ([self.delegate respondsToSelector:@selector(imagePageViewController:didDismissController:)]){
+        [self.delegate imagePageViewController:self didDismissController:YES];
+    }
 }
 
 -(void)willMoveToParentViewController:(UIViewController *)parent
@@ -202,7 +204,9 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
     (IPVImageScrollViewController *)pendingViewControllers[0];
     id pendingKey = pendingViewController.key;
     NSLog(@"%s pendingKey=%@",__PRETTY_FUNCTION__, pendingKey);
-    [self.delegate imagePageViewController:self willTransitionToKey:pendingKey];
+    if ([self.delegate respondsToSelector:@selector(imagePageViewController:willTransitionToKey:)]) {
+        [self.delegate imagePageViewController:self willTransitionToKey:pendingKey];
+    }
 }
 
 -(void)pageViewController:(UIPageViewController *)pageViewController
@@ -221,10 +225,12 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
     } else {
         NSLog(@"%s previousKey=%@ incomplete",__PRETTY_FUNCTION__, previousKey);
     }
-    [self.delegate imagePageViewController:self
-                        didFinishAnimating:finished
-                               previousKey:previousKey
-                       transitionCompleted:completed];
+    if ([self.delegate respondsToSelector:@selector(imagePageViewController:didFinishAnimating:previousKey:transitionCompleted:)]) {
+        [self.delegate imagePageViewController:self
+                            didFinishAnimating:finished
+                                   previousKey:previousKey
+                           transitionCompleted:completed];
+    }
 }
 
 @end
