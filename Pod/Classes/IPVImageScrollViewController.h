@@ -22,4 +22,6 @@
 
 @property(nonatomic, assign, readonly) id<IPVImageScrollViewControllerDataSource>dataSource;
 
+-(void)toggleZoom:(CGPoint)center;
+
 @end

@@ -72,4 +72,18 @@
     return _imageView;
 }
 
+- (void)toggleZoom:(CGPoint)center
+{
+    CGFloat scale;
+    if (self.maximumZoomScale == self.zoomScale) {
+        scale = self.minimumZoomScale;
+    } else {
+        scale = self.maximumZoomScale;
+    }
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        [self setZoomScale:scale animated:NO];
+        [self layoutIfNeeded];
+    } completion:nil];
+}
+
 @end

@@ -5,6 +5,7 @@
 @implementation IPVImageScrollViewController{
     IPVImageScrollView *_imageScrollView;
     UIActivityIndicatorView *_activityIndicatorView;
+    UIGestureRecognizer *_zoomToggleGestureRecognizer;
 }
 
 +(instancetype)imageScrollViewControllerForKey:(id)key
@@ -54,6 +55,11 @@
             _imageScrollView.alpha = 1.0;
         }];
     }
+}
+
+- (void)toggleZoom:(CGPoint)center
+{
+    [_imageScrollView toggleZoom:center];
 }
 
 @end

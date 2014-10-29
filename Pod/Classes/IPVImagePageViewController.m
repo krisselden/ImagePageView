@@ -10,7 +10,8 @@
     IPVImageScrollViewController *_imageScrollViewController;
     BOOL _interactivePopGestureRecognizerWasEnabled;
     UIBarButtonItem *_rightButtonItem;
-    UIGestureRecognizer *_toggleControlsGestureRecognizer;
+    UITapGestureRecognizer *_toggleControlsGestureRecognizer;
+    UITapGestureRecognizer *_toggleZoomGestureRecognizer;
     UIColor *_backgroundColor;
     BOOL _prefersStatusBarHidden;
     BOOL _controlsHidden;
@@ -23,7 +24,6 @@
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
     return self;
-    
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -37,7 +37,10 @@
 
 -(BOOL)prefersStatusBarHidden
 {
-    return _prefersStatusBarHidden;
+    if (_prefersStatusBarHidden) {
+        return _prefersStatusBarHidden;
+    }
+    return [super prefersStatusBarHidden];
 }
 
 -(UIStatusBarAnimation)preferredStatusBarUpdateAnimation
@@ -67,12 +70,15 @@
 - (void)viewDidLoad
 {
     [self addViewForPageViewController];
-    _toggleControlsGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleControls)];
-    [self.view addGestureRecognizer:_toggleControlsGestureRecognizer];
     [super viewDidLoad];
-
-
-
+    _toggleControlsGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleControls)];
+    _toggleControlsGestureRecognizer.numberOfTapsRequired = 1;
+    _toggleZoomGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleZoom)];
+    _toggleZoomGestureRecognizer.numberOfTapsRequired = 2;
+    [_toggleControlsGestureRecognizer requireGestureRecognizerToFail:_toggleZoomGestureRecognizer];
+    
+    [self.view addGestureRecognizer:_toggleControlsGestureRecognizer];
+    [self.view addGestureRecognizer:_toggleZoomGestureRecognizer];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -142,6 +148,12 @@
                              }];
         }
     }
+}
+
+-(void)toggleZoom
+{
+    CGPoint location = [_toggleZoomGestureRecognizer locationInView:_imageScrollViewController.view];
+    [_imageScrollViewController toggleZoom:location];
 }
 
 -(void)shareImage

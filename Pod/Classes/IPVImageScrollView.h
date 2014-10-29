@@ -4,4 +4,6 @@
 
 - (instancetype)initWithImage:(UIImage *)image;
 
+- (void)toggleZoom:(CGPoint)center;
+
 @end
