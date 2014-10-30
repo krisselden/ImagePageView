@@ -42,6 +42,9 @@
 
 - (void)setImage:(UIImage *)image
 {
+    if (!image) {
+        return; // TODO ask delegate for errorView
+    }
     UIView *view = self.view;
     _image = image;
     _imageScrollView = [[IPVImageScrollView alloc] initWithImage:image];

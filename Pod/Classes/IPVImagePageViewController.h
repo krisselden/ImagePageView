@@ -34,6 +34,7 @@
 
 - (void)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
                    didDisappear:(BOOL)animated;
+
 - (void)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
                    willAppear:(BOOL)animated;
 

@@ -2,83 +2,118 @@
 #import "IPVImageScrollViewController.h"
 #import "IPVAutoLayoutUtils.h"
 
-@interface IPVImagePageViewController () <UIPageViewControllerDataSource, UIPageViewControllerDelegate,IPVImageScrollViewControllerDataSource>
+@interface IPVImagePageViewController () <UIPageViewControllerDataSource,
+                                          UIPageViewControllerDelegate,
+                                          IPVImageScrollViewControllerDataSource>
+
+@property (nonatomic, readonly) UIPageViewController *pageViewController;
+@property (nonatomic, readonly) UITapGestureRecognizer *toggleControlsGestureRecognizer;
+@property (nonatomic, readonly) UITapGestureRecognizer *toggleZoomGestureRecognizer;
+
 @end
 
 @implementation IPVImagePageViewController{
     UIPageViewController *_pageViewController;
     IPVImageScrollViewController *_imageScrollViewController;
     BOOL _interactivePopGestureRecognizerWasEnabled;
-    UIBarButtonItem *_rightButtonItem;
     UITapGestureRecognizer *_toggleControlsGestureRecognizer;
     UITapGestureRecognizer *_toggleZoomGestureRecognizer;
+    UIProgressView *_progressView;
     UIColor *_backgroundColor;
     BOOL _prefersStatusBarHidden;
     BOOL _controlsHidden;
 }
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    return self;
-}
-
-- (instancetype)initWithCoder:(NSCoder *)coder
-{
-    self = [super initWithCoder:coder];
-    if (self) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
-    return self;
-}
-
--(BOOL)prefersStatusBarHidden
+- (BOOL)prefersStatusBarHidden
 {
     if (_prefersStatusBarHidden) {
-        return _prefersStatusBarHidden;
+        return YES;
     }
     return [super prefersStatusBarHidden];
 }
 
--(UIStatusBarAnimation)preferredStatusBarUpdateAnimation
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation
 {
     return UIStatusBarAnimationFade;
 }
 
-// TODO tap gesture recognizer for toggling nav bar and status bar
-// TODO double tap gesture recognizer for zoom to point
+- (BOOL)automaticallyAdjustsScrollViewInsets
+{
+    return NO;
+}
 
 - (UIPageViewController *)pageViewController
 {
     if (!_pageViewController) {
-        _pageViewController = [[UIPageViewController alloc]
-                               initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
-                               navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
-                               options:@{
-                                         UIPageViewControllerOptionInterPageSpacingKey:@(self.interPageSpacing)
-                                         }];
-        _pageViewController.delegate = self;
-        _pageViewController.dataSource = self;
-        [self addChildViewController:_pageViewController];
+        _pageViewController =
+        [[UIPageViewController alloc]
+         initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+         navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+         options:@{
+                   UIPageViewControllerOptionInterPageSpacingKey:@(self.interPageSpacing)
+                   }];
     }
     return _pageViewController;
 }
 
+- (UITapGestureRecognizer *)toggleControlsGestureRecognizer
+{
+    if (!_toggleControlsGestureRecognizer) {
+        _toggleControlsGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleControls)];
+        _toggleControlsGestureRecognizer.numberOfTapsRequired = 1;
+    }
+    return _toggleControlsGestureRecognizer;
+}
+
+- (UITapGestureRecognizer *)toggleZoomGestureRecognizer
+{
+    if (!_toggleZoomGestureRecognizer) {
+        _toggleZoomGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleZoom)];
+        _toggleZoomGestureRecognizer.numberOfTapsRequired = 2;
+    }
+    return _toggleZoomGestureRecognizer;
+}
+
 - (void)viewDidLoad
 {
-    [self addViewForPageViewController];
     [super viewDidLoad];
-    _toggleControlsGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleControls)];
-    _toggleControlsGestureRecognizer.numberOfTapsRequired = 1;
-    _toggleZoomGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleZoom)];
-    _toggleZoomGestureRecognizer.numberOfTapsRequired = 2;
-    [_toggleControlsGestureRecognizer requireGestureRecognizerToFail:_toggleZoomGestureRecognizer];
+    [self addPageViewController];
+    [self addGestureRecognizers];
+    [self addActionButton];
+}
+
+- (void)addPageViewController
+{
+    UIPageViewController *pageViewController = self.pageViewController;
+    pageViewController.delegate = self;
+    pageViewController.dataSource = self;
+    [self addChildViewController:pageViewController];
     
-    [self.view addGestureRecognizer:_toggleControlsGestureRecognizer];
-    [self.view addGestureRecognizer:_toggleZoomGestureRecognizer];
+    UIView *view = self.view;
+    UIView *pageView = pageViewController.view;
+    pageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [view addSubview:pageView];
+    [view addConstraints:IPVPinEdgesToSuperview(pageView, view)];
+
+    [pageViewController didMoveToParentViewController:self];
+}
+
+- (void)addGestureRecognizers
+{
+    UIGestureRecognizer *toggleControls = self.toggleControlsGestureRecognizer;
+    UIGestureRecognizer *toggleZoom = self.toggleZoomGestureRecognizer;
+    UIView *view = self.view;
+    
+    [toggleControls requireGestureRecognizerToFail:toggleZoom];
+    [view addGestureRecognizer:toggleControls];
+    [view addGestureRecognizer:toggleZoom];
+}
+
+- (void)addActionButton
+{
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareImage)];
+    rightButton.enabled = NO;
+    self.navigationItem.rightBarButtonItem = rightButton;
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -103,6 +138,7 @@
     UINavigationController *navigationController = self.navigationController;
     if (navigationController && self.parentViewController == navigationController) {
         navigationController.interactivePopGestureRecognizer.enabled = _interactivePopGestureRecognizerWasEnabled;
+        [_progressView removeFromSuperview];
     }
 }
 
@@ -113,9 +149,25 @@
     if (parent && parent == navigationController) {
         _interactivePopGestureRecognizerWasEnabled = navigationController.interactivePopGestureRecognizer.enabled;
         navigationController.interactivePopGestureRecognizer.enabled = NO;
-        _rightButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareImage)];
-        self.navigationItem.rightBarButtonItem = _rightButtonItem;
+        [self addProgressView:navigationController.navigationBar];
     }
+}
+
+-(void)addProgressView:(UINavigationBar *)navigationBar
+{
+    UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
+    CGRect bounds = navigationBar.bounds;
+    CGSize size = [progressView sizeThatFits:bounds.size];
+    CGRect frame = CGRectMake(
+                              bounds.origin.x,
+                              bounds.origin.y + bounds.size.height - size.height,
+                              bounds.size.width,
+                              size.height);
+    progressView.frame = frame;
+    progressView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    progressView.alpha = 0;
+    [navigationBar addSubview:progressView];
+    _progressView = progressView;
 }
 
 -(void)toggleControls
@@ -135,8 +187,8 @@
                                  self.view.backgroundColor = _backgroundColor;
                              }];
         } else {
-            // stash background color
             _controlsHidden = YES;
+            // stash background color
             _backgroundColor = self.view.backgroundColor;
             _prefersStatusBarHidden = YES;
             [self setNeedsStatusBarAppearanceUpdate];
@@ -166,23 +218,11 @@
     }
 }
 
--(void)addViewForPageViewController
-{
-    UIPageViewController *pageViewController = self.pageViewController;
-    UIView *view = self.view;
-    UIView *pageView = pageViewController.view;
-    pageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:pageView];
-    [view addConstraints:IPVPinEdgesToSuperview(pageView, view)];
-    [pageViewController willMoveToParentViewController:self];
-}
-
 - (void)setKey:(id)key
      direction:(UIPageViewControllerNavigationDirection)direction
       animated:(BOOL)animated
     completion:(void (^)(BOOL))completion
 {
-    NSLog(@"%s key=%@",__PRETTY_FUNCTION__, key);
     IPVImageScrollViewController * imageScrollViewController = [self imageScrollViewControllerForKey:key];
     [self setImageScrollViewController:imageScrollViewController];
     [self.pageViewController setViewControllers:@[imageScrollViewController]
@@ -201,16 +241,14 @@
 - (void)setImage:(UIImage *)image
 {
     _image = image;
-    _rightButtonItem.enabled = image ? YES : NO;
+    self.navigationItem.rightBarButtonItem.enabled = image ? YES : NO;
 }
 
 - (void)setImageScrollViewController:(IPVImageScrollViewController *)imageScrollViewController
 {
     _imageScrollViewController = imageScrollViewController;
-    id oldKey = _key;
     _key = imageScrollViewController.key;
     [self setImage:imageScrollViewController.image];
-    NSLog(@"%s oldKey%@ newKey=%@",__PRETTY_FUNCTION__, oldKey, _key);
     if (self.navigationItem) {
         NSString *title;
         if ([self.dataSource respondsToSelector:@selector(imagePageViewController:titleForKey:)]) {
@@ -231,38 +269,54 @@
     return [self.dataSource
             imagePageViewController:self
             imageForKey:key
-            // TODO display progress in nav bar with bar style progress view
-            progressHandler:nil
+            progressHandler:^(int64_t bytesReceived, int64_t bytesExpected) {
+                if (_progressView &&
+                    key == _key &&
+                    bytesExpected != NSURLSessionTransferSizeUnknown) {
+                    _progressView.alpha = 1;
+                    float percent = bytesReceived/(float)bytesExpected;
+                    [_progressView setProgress:percent animated:YES];
+                }
+            }
             completionHandler:^void(UIImage *image){
                 completionHandler(image);
                 // if current key
                 if (key == _key) {
                     [self setImage:image];
+                    if (_progressView) {
+                        [UIView animateWithDuration:0.2
+                                         animations:^{
+                            _progressView.alpha = 0;
+                        }
+                         completion:^(BOOL finished) {
+                             _progressView.progress = 0;
+                         }];
+                    }
                 }
-            }];
+             }];
 }
 
 #pragma mark - UIPageViewControllerDataSource
 
--(UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
+-(UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+      viewControllerAfterViewController:(UIViewController *)viewController
 {
     IPVImageScrollViewController *imageScrollViewController =
     (IPVImageScrollViewController *)viewController;
     id key = imageScrollViewController.key;
     id keyAfter = [self.dataSource imagePageViewController:self
                                                keyAfterKey:key];
-    NSLog(@"%s key=%@ keyAfter=%@",__PRETTY_FUNCTION__, key, keyAfter);
     return keyAfter ? [self imageScrollViewControllerForKey:keyAfter] : nil;
 }
 
--(UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
+-(UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+     viewControllerBeforeViewController:(UIViewController *)viewController
 {
     IPVImageScrollViewController *imageScrollViewController =
     (IPVImageScrollViewController *)viewController;
     id key = imageScrollViewController.key;
     id keyBefore = [self.dataSource imagePageViewController:self
                                                keyBeforeKey:key];
-    NSLog(@"%s key=%@ keyBefore=%@",__PRETTY_FUNCTION__, key, keyBefore);
     return keyBefore ? [self imageScrollViewControllerForKey:keyBefore] : nil;
 }
 
@@ -274,7 +328,6 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
     IPVImageScrollViewController *pendingViewController =
     (IPVImageScrollViewController *)pendingViewControllers[0];
     id pendingKey = pendingViewController.key;
-    NSLog(@"%s pendingKey=%@",__PRETTY_FUNCTION__, pendingKey);
     if ([self.delegate respondsToSelector:@selector(imagePageViewController:willTransitionToKey:)]) {
         [self.delegate imagePageViewController:self willTransitionToKey:pendingKey];
     }
@@ -291,10 +344,7 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
     if (completed) {
         IPVImageScrollViewController *viewController =
         (IPVImageScrollViewController *)pageViewController.viewControllers[0];
-        NSLog(@"%s previousKey=%@ complete %@",__PRETTY_FUNCTION__, previousKey, viewController.key);
         [self setImageScrollViewController:viewController];
-    } else {
-        NSLog(@"%s previousKey=%@ incomplete",__PRETTY_FUNCTION__, previousKey);
     }
     if ([self.delegate respondsToSelector:@selector(imagePageViewController:didFinishAnimating:previousKey:transitionCompleted:)]) {
         [self.delegate imagePageViewController:self
