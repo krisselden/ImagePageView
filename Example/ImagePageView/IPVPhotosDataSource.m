@@ -75,7 +75,7 @@
 }
 
 - (BOOL)thumbnailForPhoto:(IPVPhoto *)photo
-          progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+          progressHandler:(void (^)(float progress))progressHandler
         completionHandler:(void (^)(UIImage *image, NSError *error))completionHandler
 {
     return [_imageDownloader downloadURL:photo.thumbnailURL
@@ -84,7 +84,7 @@
 }
 
 - (BOOL)imageForPhoto:(IPVPhoto *)photo
-      progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+      progressHandler:(void (^)(float progress))progressHandler
     completionHandler:(void (^)(UIImage *image, NSError *error))completionHandler
 {
     return [_imageDownloader downloadURL:photo.photoURL
@@ -108,7 +108,7 @@
 
 - (BOOL)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
                     imageForKey:(id)key
-                progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+                progressHandler:(void (^)(float progress))progressHandler
               completionHandler:(void (^)(UIImage *image))completionHandler
 {
     return [self imageForPhoto:key

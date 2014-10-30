@@ -11,7 +11,7 @@
 
 - (BOOL)imagePageViewController:(IPVImagePageViewController *)imagePageViewController
                     imageForKey:(id)key
-                progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+                progressHandler:(void (^)(float progress))progressHandler
               completionHandler:(void (^)(UIImage *image))completionHandler;
 
 @optional

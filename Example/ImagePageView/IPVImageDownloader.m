@@ -13,7 +13,7 @@
 - (instancetype)initWithSession:(NSURLSession *)session
                        imageURL:(NSURL *)imageURL;
 
-- (void)addProgressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler;
+- (void)addProgressHandler:(void (^)(float progress))progressHandler;
 - (void)addCompletionHandler:(void (^)(UIImage *image, NSError *error))completionHandler;
 
 @property (readonly, nonatomic) NSURL *location;
@@ -36,7 +36,7 @@
 }
 
 -(BOOL)downloadURL:(NSURL *)imageURL
-   progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+   progressHandler:(void (^)(float progress))progressHandler
  completionHandler:(void (^)(UIImage *image, NSError *error))completionHandler
 {
     IPVImageDownload *download = _downloads[imageURL];
@@ -78,7 +78,7 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
     return self;
 }
 
-- (void)addProgressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+- (void)addProgressHandler:(void (^)(float progress))progressHandler
 {
     NSAssert([NSThread isMainThread], @"addProgressHandler should be called on main");
     if (progressHandler) {
@@ -184,9 +184,13 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
     }
     int64_t bytesReceived = _bytesReceived;
     int64_t bytesExpectedToReceive = _bytesExpectedToReceive;
+    if (_bytesExpectedToReceive == NSURLSessionTransferSizeUnknown) {
+        return;
+    }
+    float progress = bytesReceived / (float)bytesExpectedToReceive;
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (void (^handler)(int64_t bytesReceived, int64_t bytesExpectedToReceive) in _progressHandlers) {
-            handler(bytesReceived, bytesExpectedToReceive);
+        for (void (^handler)(float progress) in _progressHandlers) {
+            handler(progress);
         }
     });
 }

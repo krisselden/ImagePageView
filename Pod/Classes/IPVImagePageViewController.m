@@ -22,6 +22,7 @@
     UIColor *_backgroundColor;
     BOOL _prefersStatusBarHidden;
     BOOL _controlsHidden;
+    BOOL _progressActive;
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -158,13 +159,13 @@
     UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     CGRect bounds = navigationBar.bounds;
     CGSize size = [progressView sizeThatFits:bounds.size];
-    CGRect frame = CGRectMake(
-                              bounds.origin.x,
+    CGRect frame = CGRectMake(bounds.origin.x,
                               bounds.origin.y + bounds.size.height - size.height,
                               bounds.size.width,
                               size.height);
     progressView.frame = frame;
     progressView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    progressView.hidden = YES;
     progressView.alpha = 0;
     [navigationBar addSubview:progressView];
     _progressView = progressView;
@@ -244,11 +245,58 @@
     self.navigationItem.rightBarButtonItem.enabled = image ? YES : NO;
 }
 
+- (void)hideProgressWithAnimation:(BOOL)animated
+{
+    if (_progressView && _progressActive) {
+        _progressActive = NO;
+        [UIView
+         animateWithDuration: animated ? 0.5 : 0
+         delay:0
+         options:UIViewAnimationOptionBeginFromCurrentState
+         animations:^{
+             _progressView.alpha = 0;
+         }
+         completion:^(BOOL finished) {
+             if (finished) {
+                 _progressView.progress = 0;
+                 _progressView.hidden = YES;
+             }
+         }];
+    }
+}
+
+- (void)showProgress:(float)progress
+{
+    if (_progressView) {
+        if (_progressActive) {
+            [_progressView setProgress:progress animated:YES];
+        } else {
+            // do 0 duration animation to interrupt possible
+            // fade out animation
+            [UIView
+             animateWithDuration:0
+             delay:0
+             options:UIViewAnimationOptionBeginFromCurrentState
+             animations:^{
+                 _progressView.alpha = 1;
+             }
+             completion:^(BOOL finished) {
+                 if (finished) {
+                     _progressActive = YES;
+                     _progressView.hidden = NO;
+                     _progressView.progress = progress;
+                 }
+             }];
+        }
+    }
+}
+
 - (void)setImageScrollViewController:(IPVImageScrollViewController *)imageScrollViewController
 {
     _imageScrollViewController = imageScrollViewController;
     _key = imageScrollViewController.key;
     [self setImage:imageScrollViewController.image];
+    [self hideProgressWithAnimation:NO];
     if (self.navigationItem) {
         NSString *title;
         if ([self.dataSource respondsToSelector:@selector(imagePageViewController:titleForKey:)]) {
@@ -269,31 +317,20 @@
     return [self.dataSource
             imagePageViewController:self
             imageForKey:key
-            progressHandler:^(int64_t bytesReceived, int64_t bytesExpected) {
-                if (_progressView &&
-                    key == _key &&
-                    bytesExpected != NSURLSessionTransferSizeUnknown) {
-                    _progressView.alpha = 1;
-                    float percent = bytesReceived/(float)bytesExpected;
-                    [_progressView setProgress:percent animated:YES];
+            progressHandler:^(float progress){
+                // if current key
+                if (_key == key) {
+                    [self showProgress:progress];
                 }
             }
             completionHandler:^void(UIImage *image){
                 completionHandler(image);
                 // if current key
-                if (key == _key) {
+                if (_key == key) {
                     [self setImage:image];
-                    if (_progressView) {
-                        [UIView animateWithDuration:0.2
-                                         animations:^{
-                            _progressView.alpha = 0;
-                        }
-                         completion:^(BOOL finished) {
-                             _progressView.progress = 0;
-                         }];
-                    }
+                    [self hideProgressWithAnimation:YES];
                 }
-             }];
+            }];
 }
 
 #pragma mark - UIPageViewControllerDataSource

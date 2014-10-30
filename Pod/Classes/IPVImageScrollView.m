@@ -64,6 +64,7 @@
         // this will invalidate the layout and rerun layout (but not constraints)
         // next pass these should be equal
         self.contentInset = contentInset;
+        [self setNeedsLayout];
     }
 }
 
@@ -80,8 +81,10 @@
     } else {
         scale = self.maximumZoomScale;
     }
+    [self layoutIfNeeded];
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
         [self setZoomScale:scale animated:NO];
+        [self setNeedsLayout];
         [self layoutIfNeeded];
     } completion:nil];
 }

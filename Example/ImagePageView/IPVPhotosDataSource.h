@@ -25,10 +25,10 @@
 - (IPVPhoto *)photoAfter:(IPVPhoto *)photo;
 
 - (BOOL)thumbnailForPhoto:(IPVPhoto *)photo
-          progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+          progressHandler:(void (^)(float progress))progressHandler
         completionHandler:(void (^)(UIImage *image, NSError *error))completionHandler;
 
 - (BOOL)imageForPhoto:(IPVPhoto *)photo
-      progressHandler:(void (^)(int64_t bytesReceived, int64_t bytesExpectedToReceive))progressHandler
+      progressHandler:(void (^)(float progress))progressHandler
     completionHandler:(void (^)(UIImage *image, NSError *error))completionHandler;
 @end
