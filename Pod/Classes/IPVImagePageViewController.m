@@ -113,7 +113,7 @@
 - (void)addActionButton
 {
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareImage)];
-    rightButton.enabled = NO;
+    rightButton.enabled = _image ? YES : NO;
     self.navigationItem.rightBarButtonItem = rightButton;
 }
 
