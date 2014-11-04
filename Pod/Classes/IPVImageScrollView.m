@@ -1,6 +1,16 @@
 #import "IPVImageScrollView.h"
 #import "IPVAutoLayoutUtils.h"
 
+static inline CGFloat clamp(CGFloat value, CGFloat min, CGFloat max) {
+    if (value > max) {
+        return max;
+    }
+    if (value < min) {
+        return min;
+    }
+    return value;
+}
+
 @interface IPVImageScrollView () <UIScrollViewDelegate>
 
 @end
@@ -9,6 +19,8 @@
     UIImage *_image;
     UIImageView *_imageView;
     CGSize _lastFrameSize;
+    CGFloat _lastScale;
+    CGFloat _toggleScale;
 }
 
 - (instancetype)initWithImage:(UIImage *)image
@@ -35,14 +47,27 @@
     if (!CGSizeEqualToSize(_lastFrameSize, frameSize)) {
         CGSize boundsSize = self.bounds.size;
         CGSize imageSize = _image.size;
+
         CGFloat xScale = boundsSize.width  / imageSize.width;
         CGFloat yScale = boundsSize.height / imageSize.height;
-        CGFloat scale = MIN(xScale, yScale);
-        self.minimumZoomScale = scale;
-        self.maximumZoomScale = scale * 2;
+        
+        
+        CGFloat min = MIN(xScale, yScale);
+        CGFloat max;
+        if (boundsSize.width > boundsSize.height) {
+            max = yScale * 3;
+        } else {
+            max = xScale * 3;
+        }
+
+        _toggleScale = max;
+
+        self.minimumZoomScale = min;
+        self.maximumZoomScale = max;
         // TODO we need to restore the last scale before the size change
         // same with center contentOffset
-        self.zoomScale = scale;
+        _lastScale = clamp(_lastScale, min, max);
+        self.zoomScale = _lastScale;
         _lastFrameSize = frameSize;
     }
 
@@ -64,7 +89,7 @@
         // this will invalidate the layout and rerun layout (but not constraints)
         // next pass these should be equal
         self.contentInset = contentInset;
-        [self setNeedsLayout];
+        [super layoutSubviews];
     }
 }
 
@@ -73,15 +98,19 @@
     return _imageView;
 }
 
+- (void)layoutSublayersOfLayer:(CALayer *)layer
+{
+    [super layoutSublayersOfLayer:layer];
+}
+
 - (void)toggleZoom:(CGPoint)center
 {
     CGFloat scale;
-    if (self.maximumZoomScale == self.zoomScale) {
+    if (self.zoomScale >= _toggleScale) {
         scale = self.minimumZoomScale;
     } else {
-        scale = self.maximumZoomScale;
+        scale = _toggleScale;
     }
-    [self layoutIfNeeded];
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
         [self setZoomScale:scale animated:NO];
         [self setNeedsLayout];

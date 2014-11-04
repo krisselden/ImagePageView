@@ -59,7 +59,7 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
     NSURL *_imageURL;
     NSMutableArray *_progressHandlers;
     NSMutableArray *_completionHandlers;
-    NSURLSessionTask *_task;
+    NSURLSessionDownloadTask *_task;
     int64_t _bytesReceived;
     int64_t _bytesExpectedToReceive;
     BOOL _isFlushing;
@@ -109,7 +109,7 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
     if (!_task) {
         _task = [_session downloadTaskWithURL:_imageURL
                             completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
-                                [self downloadComplete:location error:error];
+                                [self downloadComplete:location response:response error:error];
                             }];
         [_task addObserver:self forKeyPath:@"countOfBytesExpectedToReceive" options:NSKeyValueObservingOptionNew context:&countOfBytesExpectedToReceiveKey];
         [_task addObserver:self forKeyPath:@"countOfBytesReceived" options:NSKeyValueObservingOptionNew context:&countOfBytesReceivedKey];
@@ -118,11 +118,26 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
 }
 
 - (void)downloadComplete:(NSURL *)location
+                response:(NSURLResponse *)response
                    error:(NSError *)error
 {
     [_task removeObserver:self forKeyPath:@"countOfBytesExpectedToReceive"];
     [_task removeObserver:self forKeyPath:@"countOfBytesReceived"];
-    [self flush:location error:error];
+    NSURL *targetURL = nil;
+    if (!error) {
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSURL *cachesDirURL = [fileManager URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&error];
+        if (!error) {
+            targetURL = [cachesDirURL URLByAppendingPathComponent:[response suggestedFilename]];
+            if ([targetURL checkResourceIsReachableAndReturnError:nil]) {
+                [fileManager removeItemAtURL:targetURL error:nil];
+            }
+            [fileManager moveItemAtURL:location toURL:targetURL error:&error];
+        }
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self flush:targetURL error:error];
+    });
 }
 
 - (void)flush:(NSURL *)location error:(NSError *)error
@@ -149,7 +164,8 @@ static const char *countOfBytesExpectedToReceiveKey = "countOfBytesExpectedToRec
             flush(nil, error);
         });
     } else {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+        dispatch_async(queue, ^{
             NSError *error;
             NSData *data = [NSData dataWithContentsOfURL:location options:0 error:&error];
             UIImage *image;
