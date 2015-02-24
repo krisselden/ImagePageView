@@ -81,6 +81,7 @@
     [self addPageViewController];
     [self addGestureRecognizers];
     [self addActionButton];
+    [self addProgressView];
 }
 
 - (void)addPageViewController
@@ -139,7 +140,6 @@
     UINavigationController *navigationController = self.navigationController;
     if (navigationController && self.parentViewController == navigationController) {
         navigationController.interactivePopGestureRecognizer.enabled = _interactivePopGestureRecognizerWasEnabled;
-        [_progressView removeFromSuperview];
     }
 }
 
@@ -150,24 +150,26 @@
     if (parent && parent == navigationController) {
         _interactivePopGestureRecognizerWasEnabled = navigationController.interactivePopGestureRecognizer.enabled;
         navigationController.interactivePopGestureRecognizer.enabled = NO;
-        [self addProgressView:navigationController.navigationBar];
     }
 }
 
--(void)addProgressView:(UINavigationBar *)navigationBar
+-(void)addProgressView
 {
     UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
-    CGRect bounds = navigationBar.bounds;
-    CGSize size = [progressView sizeThatFits:bounds.size];
-    CGRect frame = CGRectMake(bounds.origin.x,
-                              bounds.origin.y + bounds.size.height - size.height,
-                              bounds.size.width,
-                              size.height);
-    progressView.frame = frame;
-    progressView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    progressView.hidden = YES;
+    progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    progressView.hidden = NO;
     progressView.alpha = 0;
-    [navigationBar addSubview:progressView];
+    [self.view addSubview:progressView];
+    [self.view addConstraints:@[[NSLayoutConstraint constraintWithItem:progressView
+                                                             attribute:NSLayoutAttributeTop
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self.topLayoutGuide
+                                                             attribute:NSLayoutAttributeBottom
+                                                            multiplier:1
+                                                              constant:0],
+                                IPVEqualsAttribute(progressView, self.view, NSLayoutAttributeRight),
+                                IPVEqualsAttribute(progressView, self.view, NSLayoutAttributeLeft)
+                                ]];
     _progressView = progressView;
 }
 
@@ -200,6 +202,7 @@
                                  self.view.backgroundColor = [UIColor blackColor];
                              }];
         }
+        [self updateActivityIndicatorViewStyles];
     }
 }
 
@@ -234,9 +237,28 @@
 
 - (IPVImageScrollViewController *)imageScrollViewControllerForKey:(id)key
 {
-    return [IPVImageScrollViewController
-            imageScrollViewControllerForKey:key
-            dataSource:self];
+    IPVImageScrollViewController *imageScrollViewController = [IPVImageScrollViewController imageScrollViewControllerForKey:key
+                                                                                                                 dataSource:self];
+    [self updateActivityIndicatorViewStyleFor:imageScrollViewController];
+    return imageScrollViewController;
+}
+
+- (void)updateActivityIndicatorViewStyles
+{
+    for (IPVImageScrollViewController *viewController in _pageViewController.viewControllers) {
+        [self updateActivityIndicatorViewStyleFor:viewController];
+    }
+}
+
+- (void)updateActivityIndicatorViewStyleFor:(IPVImageScrollViewController *)imageScrollViewController
+{
+    if (imageScrollViewController.activityIndicatorView) {
+        if (_controlsHidden) {
+            imageScrollViewController.activityIndicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        } else {
+            imageScrollViewController.activityIndicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        }
+    }
 }
 
 - (void)setImage:(UIImage *)image

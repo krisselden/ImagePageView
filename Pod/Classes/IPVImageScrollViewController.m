@@ -4,7 +4,6 @@
 
 @implementation IPVImageScrollViewController{
     IPVImageScrollView *_imageScrollView;
-    UIActivityIndicatorView *_activityIndicatorView;
     UIGestureRecognizer *_zoomToggleGestureRecognizer;
 }
 

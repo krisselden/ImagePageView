@@ -20,6 +20,8 @@
 
 @property(nonatomic, readonly) UIImage *image;
 
+@property(nonatomic, readonly) UIActivityIndicatorView *activityIndicatorView;
+
 @property(nonatomic, assign, readonly) id<IPVImageScrollViewControllerDataSource>dataSource;
 
 -(void)toggleZoom:(CGPoint)center;
