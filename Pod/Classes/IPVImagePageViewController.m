@@ -90,7 +90,7 @@
     pageViewController.delegate = self;
     pageViewController.dataSource = self;
     [self addChildViewController:pageViewController];
-    
+
     UIView *view = self.view;
     UIView *pageView = pageViewController.view;
     pageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -105,7 +105,7 @@
     UIGestureRecognizer *toggleControls = self.toggleControlsGestureRecognizer;
     UIGestureRecognizer *toggleZoom = self.toggleZoomGestureRecognizer;
     UIView *view = self.view;
-    
+
     [toggleControls requireGestureRecognizerToFail:toggleZoom];
     [view addGestureRecognizer:toggleControls];
     [view addGestureRecognizer:toggleZoom];
@@ -216,6 +216,12 @@
 {
     if (_image) {
         UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[_image] applicationActivities:nil];
+        if ( [activityViewController respondsToSelector:@selector(popoverPresentationController)] ) {
+            // iOS8+
+            activityViewController.popoverPresentationController.barButtonItem =
+            self.navigationItem.rightBarButtonItem;
+        }
+
         [self presentViewController:activityViewController
                            animated:YES
                          completion:^{}];
